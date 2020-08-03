@@ -1,0 +1,26 @@
+﻿@model TravelTracker.Models.ViewModels.RegisterViewModel
+
+@{
+    ViewBag.Title = "Create New Account";
+}
+
+<h3>Create new account</h3>
+<form asp-action="Register" method="post">
+    <div class="">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="form-group">
+            <input asp-for="Email" class="form-control" placeholder="Email"/>
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <input asp-for="Password" class="form-control" placeholder="Password"/>
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm Password"/>
+            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+        </div>
+        <button class="btn btn-primary" type="submit">Register</button>
+    </div>
+
+</form>

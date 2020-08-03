@@ -1,0 +1,74 @@
+﻿@model IEnumerable<Destination>
+
+@{
+    ViewBag.Title = "Home Page";
+}
+
+
+
+<a class="btn btn-primary fixed-width-lg" asp-action="New">Add new destination</a>
+<a class="btn btn-primary fixed-width-lg" asp-action="Map">Map View</a>
+<hr />
+<h3>Places visited</h3>
+<div class="row">
+    @{ foreach (var dest in Model)
+       {
+            @if (dest.Visited == true)
+            {
+                <div class="col-12 col-md-6 col-lg-4 d-flex">
+                    <div class="card my-3">
+                            <div class="card-body flex-fill">
+                                <div class="card-title">@dest.Address</div>
+                                <!--
+                                   If ImageFile is a url stop, otherwise  append 
+                                   ~/images/destinations/ to the front of ImageFile
+                                -->
+                                @if (dest.ImageFile.StartsWith("https://"))
+                                {
+                                    <img class="card-img-top" src="@dest.ImageFile" />
+                                }
+                                else
+                                {
+                                    <img class="card-img-top" src="~/images/destinations/@dest.ImageFile" alt="Image file: @dest.ImageFile" />
+                                }
+
+                                <p>@dest.Details</p>
+                                <a class="btn btn-primary fixed-width-sm" asp-action="Show" asp-route-id="@dest.Id">View</a>
+                                <a class="btn btn-warning fixed-width-sm float-right" asp-action="Edit" asp-route-id="@dest.Id">Edit</a>
+                            </div>
+
+                    </div>
+                </div>
+            }
+       }
+    }      
+</div>
+<hr />
+<h3>Want to Visit</h3>
+<div class="row">
+    @foreach (var dest in Model)
+    {
+        if (dest.Visited == false)
+        {
+            <div class="col-12 col-md-6 col-lg-4 d-flex">
+                <div class="card my-3">
+                    <div class="card-body flex-fill">
+                        <div class="card-title">@dest.Address</div>
+                        @if (dest.ImageFile.StartsWith("https://"))
+                        {
+                            <img class="card-img-top" src="@dest.ImageFile" />
+                        }
+                        else
+                        {
+                            <img class="card-img-top" src="~/images/destinations/@dest.ImageFile" alt="Image file: @dest.ImageFile" />
+                        }
+
+                        <p>@dest.Details</p>
+                        <a class="btn btn-primary fixed-width-sm" asp-action="Show" asp-route-id="@dest.Id">View</a>
+                        <a class="btn btn-warning fixed-width-sm float-right" asp-action="Edit" asp-route-id="@dest.Id">Edit</a>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
