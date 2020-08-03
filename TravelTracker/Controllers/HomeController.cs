@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using Microsoft.Owin.BuilderProperties;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
+using Microsoft.Extensions.Configuration;
 
 namespace TravelTracker.Controllers
 {
@@ -20,12 +21,14 @@ namespace TravelTracker.Controllers
     {
         private readonly IDestinationRepo _destinationRepo;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IConfiguration _config;
         static readonly HttpClient client = new HttpClient();
 
-        public HomeController(IDestinationRepo destinationRepo, IWebHostEnvironment webHostEnvironment)
+        public HomeController(IDestinationRepo destinationRepo, IWebHostEnvironment webHostEnvironment, IConfiguration config)
         {
             _destinationRepo = destinationRepo;
             _webHostEnvironment = webHostEnvironment;
+            _config = config;
         }
 
         // Map View
@@ -56,6 +59,7 @@ namespace TravelTracker.Controllers
         [HttpGet]
         public IActionResult New()
         {
+            ViewBag.ApiKey = _config["ApiKey"];
             return View(new DestinationCreateViewModel());
         }
 
@@ -63,7 +67,6 @@ namespace TravelTracker.Controllers
         public async Task<IActionResult> New(DestinationCreateViewModel dest)
         {
             await GetStaticMapAsync(dest);
-            Console.WriteLine("dest.Address: " + dest.Address);
             return View(dest);
         }
 
@@ -126,6 +129,7 @@ namespace TravelTracker.Controllers
                 Details = destination.Details,
                 Visited = destination.Visited
             };
+            ViewBag.ApiKey = _config["ApiKey"];
             return View(dest);
         }
 
@@ -198,7 +202,7 @@ namespace TravelTracker.Controllers
             string address = dest.Address.Replace(' ', '+');
             try
             {
-                HttpResponseMessage response = await client.GetAsync("https://maps.googleapis.com/maps/api/geocode/json?address=" + address + "&key=AIzaSyAv0JJwM3kfbQCFnGQgGeKAyvgXDMUHlu4");
+                HttpResponseMessage response = await client.GetAsync("https://maps.googleapis.com/maps/api/geocode/json?address=" + address + "&key=" + _config["ApiKey"]);
                 response.EnsureSuccessStatusCode();
                 string responseBody = await response.Content.ReadAsStringAsync();
                 // For debugging purposes
@@ -224,7 +228,7 @@ namespace TravelTracker.Controllers
                             - result.results[0].geometry.bounds.southwest.lng));
                         zoom = (int)Math.Round(14 / (Math.Sqrt(size) + .9) + 2);
                     }
-                    dest.ImageUrl = "https://maps.googleapis.com/maps/api/staticmap?size=768x512&zoom=" + zoom + "&center=" + dest.Lat + "," + dest.Lng + "&style=feature:landscape|element:all|hue:0xf5f5f5|lightness:50&style=feature:poi|element:all|visibility:off&style=feature:road|element:all|saturation:-100|lightness:45&style=feature:road.highway|element:all|visibility:simplified&style=feature:transit|element:all|visibility:off&style=feature:water|element:all|color:0x9acfd3|visibility:on&key=AIzaSyAv0JJwM3kfbQCFnGQgGeKAyvgXDMUHlu4";
+                    dest.ImageUrl = "https://maps.googleapis.com/maps/api/staticmap?size=768x512&zoom=" + zoom + "&center=" + dest.Lat + "," + dest.Lng + "&style=feature:landscape|element:all|hue:0xf5f5f5|lightness:50&style=feature:poi|element:all|visibility:off&style=feature:road|element:all|saturation:-100|lightness:45&style=feature:road.highway|element:all|visibility:simplified&style=feature:transit|element:all|visibility:off&style=feature:water|element:all|color:0x9acfd3|visibility:on&key=" + _config["ApiKey"];
                 }
                 else
                 {
